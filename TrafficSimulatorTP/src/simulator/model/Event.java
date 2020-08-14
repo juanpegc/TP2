@@ -17,7 +17,7 @@ public abstract class Event implements Comparable<Event> {
 
 	@Override
 	public int compareTo(Event o) {
-		// TODO complete
+		// TODO complete the method to compare events according to their _time
 		return 0;
 	}
 
