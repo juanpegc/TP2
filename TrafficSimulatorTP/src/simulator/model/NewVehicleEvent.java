@@ -3,6 +3,10 @@ package simulator.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.RoadException;
+import exceptions.RoadMapException;
+import exceptions.VehicleException;
+
 public class NewVehicleEvent extends Event {
 
 	private String id;
@@ -19,14 +23,14 @@ public class NewVehicleEvent extends Event {
 	}
 
 	@Override
-	void execute(RoadMap map) {
+	void execute(RoadMap map) throws VehicleException, RoadException, RoadMapException {
 		List<Junction> itin = new ArrayList<>();
 		for (int i = 0; i < itinerary.size(); i++) {
 			itin.add(map.getJunction(itinerary.get(i)));
 		}
 		Vehicle v = new Vehicle(id, maxSpeed, contClass, itin);
 		map.addVehicle(v);
-		map.getVehicle(v._id).moveToNextRoad();
+		map.getVehicle(v.getId()).moveToNextRoad();
 	}
 
 }

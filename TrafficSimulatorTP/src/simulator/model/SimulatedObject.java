@@ -2,6 +2,9 @@ package simulator.model;
 
 import org.json.JSONObject;
 
+import exceptions.RoadException;
+import exceptions.VehicleException;
+
 public abstract class SimulatedObject {
 
 	protected String _id;
@@ -19,7 +22,7 @@ public abstract class SimulatedObject {
 		return _id;
 	}
 
-	abstract void advance(int time);
+	abstract void advance(int time) throws VehicleException, RoadException;
 
 	abstract public JSONObject report();
 }

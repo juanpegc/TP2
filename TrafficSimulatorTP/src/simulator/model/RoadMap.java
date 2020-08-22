@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import exceptions.JunctionException;
+import exceptions.RoadMapException;
 
 public class RoadMap {
 
@@ -28,31 +32,45 @@ public class RoadMap {
 	protected void addJunction(Junction j) {
 		if (!listJunction.contains(j)) {
 			listJunction.add(j);
-			if (!mapJunction.containsKey(j._id))
-				mapJunction.put(j._id, j);
+			if (!mapJunction.containsKey(j.getId()))
+				mapJunction.put(j.getId(), j);
 		}
 
 	}
 
-	protected void addRoad(Road r) {
-		/*
-		 * añade la carretera r al final de la lista de carreteras y modifica el mapa
-		 * correspondiente. Debes comprobar que se cumplen lo siguiente: : (i) no existe
-		 * ninguna otra carretera con el mismo identificador; y (ii) los cruces que
-		 * conecta la carretera existen en el mapa de carreteras. En caso de que no se
-		 * cumplan el método lanza una excepcion.
-		 */
+	protected void addRoad(Road r) throws RoadMapException, JunctionException {
+		if (mapRoad.get(r.getId()) != null || !mapJunction.containsKey(r.getSrcJunc().getId())
+				|| !mapJunction.containsKey(r.getDestJunc().getId())) {
+			throw new RoadMapException("Invalid road");
+		}
+		// Cruce origen - carretera
+		mapJunction.get(r.getSrcJunc().getId()).addOutGoingRoad(r);
+		mapJunction.get(r.getDestJunc().getId()).addIncommingRoad(r);
+		listRoad.add(r);
+		mapRoad.put(r.getId(), r);
+
 	}
 
-	protected void addVehicle(Vehicle v) {
-		/*
-		 * añade el vehículo v al final de la lista de vehículos y modifica el mapa de
-		 * vehículos en concordancia. Debes comprobar que los siguientes puntos se
-		 * cumplen: (i) no existe ningún otro vehículo con el mismo identificador; y
-		 * (ii) el itinerario es válido, es decir, existen carreteras que conecten los
-		 * cruces consecutivos de su itinerario. En caso de que no se cumplan (i) y
-		 * (ii), el método debe lanzar una excepción.
-		 */
+	protected void addVehicle(Vehicle v) throws RoadMapException {
+		boolean valid = mapVehicle.get(v.getId()) == null;
+
+		if (valid) {
+			int i = 0;
+			while (i < v.getItinerary().size() - 1 && valid) {
+				Junction src = v.getItinerary().get(i);
+				Junction dest = v.getItinerary().get(i + 1);
+				for (Road r : listRoad) {
+					valid = valid || (r.getSrcJunc() == src && r.getDestJunc() == dest); // TODO no es &&?
+				}
+				i++;
+			}
+		}
+		if (valid) {
+			listVehicle.add(v);
+			mapVehicle.put(v.getId(), v);
+		} else {
+			throw new RoadMapException("Invalid vehicle");
+		}
 	}
 
 	public Junction getJunction(String id) {
@@ -80,20 +98,35 @@ public class RoadMap {
 	}
 
 	protected void reset() {
-		listJunction = new ArrayList<>();
-		listRoad = new ArrayList<>();
-		listVehicle = new ArrayList<>();
-		mapJunction = new HashMap<>();
-		mapRoad = new HashMap<>();
-		mapVehicle = new HashMap<>();
+		listJunction.clear();
+		listRoad.clear();
+		listVehicle.clear();
+		mapJunction.clear();
+		mapRoad.clear();
+		mapVehicle.clear();
 	}
 
 	public JSONObject report() {
 		JSONObject jo = new JSONObject();
-		jo.put("junctions", listJunction);
-		jo.put("road", listRoad);
-		jo.put("vehicles", listVehicle);
-		
+		JSONArray ja = new JSONArray();
+
+		for (Junction j : listJunction) {
+			ja.put(j.report());
+		}
+		jo.put("junctions", ja);
+
+		ja = new JSONArray();
+		for (Road r : listRoad) {
+			ja.put(r.report());
+		}
+		jo.put("road", ja);
+
+		ja = new JSONArray();
+		for (Vehicle v : listVehicle) {
+			ja.put(v.report());
+		}
+		jo.put("vehicles", ja);
+
 		return jo;
 	}
 

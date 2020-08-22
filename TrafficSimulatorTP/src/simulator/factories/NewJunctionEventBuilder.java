@@ -1,7 +1,10 @@
 package simulator.factories;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import exceptions.SetContClassException;
+import exceptions.WeatherException;
 import simulator.model.DequeuingStrategy;
 import simulator.model.Event;
 import simulator.model.LightSwitchingStrategy;
@@ -19,7 +22,7 @@ public class NewJunctionEventBuilder extends Builder<Event> {
 	}
 
 	@Override
-	protected Event createTheInstance(JSONObject data) {
+	protected Event createTheInstance(JSONObject data) throws JSONException, SetContClassException, WeatherException {
 		return new NewJunctionEvent(
 				data.getInt("time"),
 				data.getString("id"),

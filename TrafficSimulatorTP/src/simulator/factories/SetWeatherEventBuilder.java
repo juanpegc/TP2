@@ -3,8 +3,10 @@ package simulator.factories;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import exceptions.WeatherException;
 import simulator.misc.Pair;
 import simulator.model.Event;
 import simulator.model.SetWeatherEvent;
@@ -17,7 +19,7 @@ public class SetWeatherEventBuilder extends Builder<Event> {
 	}
 
 	@Override
-	protected Event createTheInstance(JSONObject data) {
+	protected Event createTheInstance(JSONObject data) throws JSONException, WeatherException {
 		List<Pair<String, Weather>> l = new ArrayList<>();
 		for (Object o : data.getJSONArray("info")) {
 			String road = (String) ((JSONObject) o).get("road");

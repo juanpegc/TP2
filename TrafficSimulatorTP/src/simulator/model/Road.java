@@ -1,8 +1,13 @@
 package simulator.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import exceptions.RoadException;
+import exceptions.VehicleException;
 
 public abstract class Road extends SimulatedObject {
 
@@ -17,41 +22,45 @@ public abstract class Road extends SimulatedObject {
 	private List<Vehicle> vehicles; // Lista de vehículos en la carretera
 
 	protected Road(String id, Junction srcJunc, Junction destJunc, int maxSpeed, int contLimit, int length,
-			Weather weather) {
+			Weather weather) throws RoadException {
 		super(id);
 		if (maxSpeed <= 0 || contLimit < 0 || length <= 0 || srcJunc == null || destJunc == null || weather == null) {
-			// throw exception
+			throw new RoadException("Invalid arguments");
 		}
-		speedLimit = maxSpeed;
+		this.srcJunc = srcJunc;
+		this.destJunc = destJunc;
 		this.length = length;
-		// ...
+		this.maxSpeed = maxSpeed;
+		speedLimit = maxSpeed;
+		this.contLimit = contLimit;
+		this.weather = weather;
+		vehicles = new ArrayList<>();
 	}
 
-	protected void enter(Vehicle v) {
+	protected void enter(Vehicle v) throws RoadException {
 		if (v.getLocation() == 0 && v.getSpeed() == 0) {
 			vehicles.add(v);
 		} else {
-			// throw exception
+			throw new RoadException("Invalid vehicle");
 		}
 	}
 
 	protected void exit(Vehicle v) {
-
-		// Elimina al vehiculo de vehicles
+		vehicles.remove(v);
 	}
 
-	protected void setWeather(Weather w) {
+	protected void setWeather(Weather w) throws RoadException {
 		if (w == null) {
-			// throw exception
+			throw new RoadException("Invalid weather");
 		} else
 			this.weather = w;
 	}
 
-	protected void addContamination(int c) {
+	protected void addContamination(int c) throws RoadException {
 		if (c >= 0)
 			contamination += c;
 		else {
-			// throw exception
+			throw new RoadException("Invalid contamination");
 		}
 	}
 
@@ -59,25 +68,19 @@ public abstract class Road extends SimulatedObject {
 
 	protected abstract void updateSpeedLimit();
 
-	protected abstract int calculateVehicleSpeed(Vehicle v);
+	protected abstract int calculateVehicleSpeed(Vehicle v) throws VehicleException;
 
 	@Override
-	void advance(int time) {
-		// TODO
-		/*
-		 * (1) llama a reduceTotalContamination para reducir la contaminación total, es
-		 * decir, la disminución de CO2.(2) llama a updateSpeedLimit para establecer el
-		 * límite de velocidad de la carretera en el paso de simulación actual. (3)
-		 * recorre la lista de vehículos (desde el primero al último) y, para cada
-		 * vehículo: a) pone la velocidad del vehículo al valor devuelto por
-		 * calculateVehicleSpeed. b) llama al método advance del vehículo. Recuerda
-		 * ordenar la lista de vehículos por su localización al final del método.
-		 * 
-		 */
+	void advance(int time) throws VehicleException {
+		reduceTotalContamination();
+		updateSpeedLimit();
+		for (int i = 0; i < vehicles.size(); i++) {
+			vehicles.get(i).setSpeed(calculateVehicleSpeed(vehicles.get(i)));
+			vehicles.get(i).advance(time);
+			// TODO Ordenar por localización
+		}
 
 	}
-	
-	
 
 	public Junction getSrcJunc() {
 		return srcJunc;
@@ -98,7 +101,7 @@ public abstract class Road extends SimulatedObject {
 	public int getSpeedLimit() {
 		return speedLimit;
 	}
-	
+
 	public void setSpeedLimit(int s) {
 		speedLimit = s;
 	}
@@ -117,9 +120,10 @@ public abstract class Road extends SimulatedObject {
 
 	public void reduceContamination(int c) {
 		contamination -= c;
-		if(contamination < 0) contamination = 0;
+		if (contamination < 0)
+			contamination = 0;
 	}
-	
+
 	public List<Vehicle> getVehicles() {
 		return vehicles;
 	}
@@ -131,7 +135,12 @@ public abstract class Road extends SimulatedObject {
 		jo.put("speedlimit", speedLimit);
 		jo.put("weather", weather);
 		jo.put("co2", contamination);
-		jo.put("vehicles", vehicles);
+		
+		JSONArray ja = new JSONArray();
+		for(Vehicle v: vehicles) {
+			ja.put(v.report());
+		}
+		jo.put("vehicles", ja);
 		return jo;
 	}
 

@@ -3,7 +3,11 @@ package simulator.factories;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import exceptions.SetContClassException;
+import exceptions.WeatherException;
 
 public class BuilderBasedFactory<T> implements Factory<T> {
 
@@ -14,7 +18,7 @@ public class BuilderBasedFactory<T> implements Factory<T> {
 	}
 
 	@Override
-	public T createInstance(JSONObject info) {
+	public T createInstance(JSONObject info) throws JSONException, SetContClassException, WeatherException {
 		if (info != null) {
 			for (Builder<T> bb : _builders) {
 				T o = bb.createInstance(info);

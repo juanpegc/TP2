@@ -1,10 +1,17 @@
 package simulator.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import exceptions.JunctionException;
+import exceptions.RoadException;
+import exceptions.VehicleException;
 
 public class Junction extends SimulatedObject {
 
@@ -18,34 +25,41 @@ public class Junction extends SimulatedObject {
 	private DequeuingStrategy dqStrategy;// Estrategia para eliminar vehículos de las colas
 	private int xCoor, yCoor;// Coordenadas
 
-	protected Junction(String id, LightSwitchingStrategy lsStrategy, DequeuingStrategy dqStrategy, int xCoor,
-			int yCoor) {
+	protected Junction(String id, LightSwitchingStrategy lsStrategy, DequeuingStrategy dqStrategy, int xCoor, int yCoor)
+			throws JunctionException {
 		super(id);
 		if (lsStrategy == null || dqStrategy == null || xCoor < 0 || yCoor < 0) {
-			// throw exception
+			throw new JunctionException("Invalid arguments");
 		}
 
 		this.lsStrategy = lsStrategy;
 		this.dqStrategy = dqStrategy;
 		this.xCoor = xCoor;
 		this.yCoor = yCoor;
+		lightGreenIndex = -1;
+		lastSwitchingTime = 0;
+		roads = new ArrayList<>();
+		map = new HashMap<>();
+		roadList = new HashMap<>();
+		eListRoads = new ArrayList<>();
 	}
 
-	protected void addIncommingRoad(Road r) {
-		if (r.getDestJunc()._id.equals(_id)) {
+	protected void addIncommingRoad(Road r) throws JunctionException {
+		if (r.getDestJunc().getId() == this.getId()) {
 			roads.add(r);
 			List<Vehicle> road = new LinkedList<>();
 			eListRoads.add(road);
 			roadList.put(r, road);
+		} else {
+			throw new JunctionException("Invalid road");
 		}
 	}
 
-	protected void addOutGoingRoad(Road r) {
-
+	protected void addOutGoingRoad(Road r) throws JunctionException {
 		if (r.getSrcJunc().equals(this) && map.get(r.getDestJunc()) == null) {
 			map.put(r.getDestJunc(), r);
 		} else {
-			// TODO throw exception
+			throw new JunctionException("Invalid road");
 		}
 	}
 
@@ -60,17 +74,21 @@ public class Junction extends SimulatedObject {
 	}
 
 	@Override
-	void advance(int time) {
-		List<Vehicle> list = dqStrategy.dequeue(eListRoads.get(lightGreenIndex));
-		for (int i = 0; i < list.size(); i++) {
-			list.get(i).advance(time);
-			list.remove(i);
-		}
-		int nextGreen = lsStrategy.chooseNextGreen(roads, eListRoads, lightGreenIndex, lastSwitchingTime, time);
-		// TODO el último parámetro es time?
-		if (nextGreen != lightGreenIndex) {
-			lightGreenIndex = nextGreen;
-			lastSwitchingTime = time;
+	void advance(int time) throws VehicleException, RoadException {
+		if (lightGreenIndex != -1) {
+			List<Vehicle> list = dqStrategy.dequeue(eListRoads.get(lightGreenIndex));
+
+			for (int i = 0; i < list.size(); i++) {
+				list.get(i).moveToNextRoad();
+				list.remove(i);
+			}
+
+		} else {
+			int nextGreen = lsStrategy.chooseNextGreen(roads, eListRoads, lightGreenIndex, lastSwitchingTime, time);
+			if (nextGreen != lightGreenIndex) {
+				lightGreenIndex = nextGreen;
+				lastSwitchingTime = time;
+			}
 		}
 	}
 
@@ -78,8 +96,17 @@ public class Junction extends SimulatedObject {
 	public JSONObject report() {
 		JSONObject jo = new JSONObject();
 		jo.put("id", _id);
-		jo.put("green", roads.get(lightGreenIndex));
-		jo.put("queues", roads);
+		if (lightGreenIndex == -1)
+			jo.put("green", "none");
+		else
+			jo.put("green", roads.get(lightGreenIndex));
+
+		JSONArray ja = new JSONArray();
+		for (Road r : roads) {
+			ja.put(r.report());
+		}
+		jo.put("queues", ja);
+
 		return jo;
 	}
 }

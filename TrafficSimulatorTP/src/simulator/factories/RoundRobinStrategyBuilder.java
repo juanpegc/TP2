@@ -1,5 +1,6 @@
 package simulator.factories;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import simulator.model.LightSwitchingStrategy;
@@ -15,7 +16,7 @@ public class RoundRobinStrategyBuilder extends Builder<LightSwitchingStrategy> {
 	protected LightSwitchingStrategy createTheInstance(JSONObject data) {
 		try {
 			return new RoundRobinStrategy(data.getInt("timeslot"));
-		} catch (Exception e) {// TODO exception)
+		} catch (JSONException e) {
 			return new RoundRobinStrategy(1);
 		}
 	}

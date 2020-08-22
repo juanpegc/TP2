@@ -1,9 +1,12 @@
 package simulator.model;
 
+import exceptions.RoadException;
+import exceptions.VehicleException;
+
 public class InterCityRoad extends Road {
 
 	protected InterCityRoad(String id, Junction srcJunc, Junction destJunc, int maxSpeed, int contLimit, int length,
-			Weather weather) {
+			Weather weather) throws RoadException {
 		super(id, srcJunc, destJunc, maxSpeed, contLimit, length, weather);
 	}
 
@@ -49,12 +52,11 @@ public class InterCityRoad extends Road {
 	}
 
 	@Override
-	protected int calculateVehicleSpeed(Vehicle v) { //TODO esto está mal
+	protected int calculateVehicleSpeed(Vehicle v) throws VehicleException{
 		if (getWeather().equals(Weather.STORM))
-			v.setSpeed((int) (getSpeedLimit() * 0.8));
+			v.setSpeed((int) (getSpeedLimit() * 0.8));	
 		else
 			v.setSpeed(getSpeedLimit());
-
 		return v.getSpeed();
 	}
 

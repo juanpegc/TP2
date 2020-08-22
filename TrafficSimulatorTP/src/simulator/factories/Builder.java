@@ -1,6 +1,10 @@
 package simulator.factories;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import exceptions.SetContClassException;
+import exceptions.WeatherException;
 
 public abstract class Builder<T> {
 	protected String _type;
@@ -12,7 +16,7 @@ public abstract class Builder<T> {
 			_type = type;
 	}
 
-	public T createInstance(JSONObject info) {
+	public T createInstance(JSONObject info) throws JSONException, SetContClassException, WeatherException {
 
 		T b = null;
 
@@ -23,5 +27,5 @@ public abstract class Builder<T> {
 		return b;
 	}
 
-	protected abstract T createTheInstance(JSONObject data);
+	protected abstract T createTheInstance(JSONObject data) throws JSONException, SetContClassException, WeatherException;
 }

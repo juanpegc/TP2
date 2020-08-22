@@ -1,5 +1,9 @@
 package simulator.model;
 
+import exceptions.JunctionException;
+import exceptions.RoadException;
+import exceptions.RoadMapException;
+
 public abstract class NewRoadEvent extends Event {
 
 	private String id;
@@ -23,12 +27,12 @@ public abstract class NewRoadEvent extends Event {
 	}
 
 	@Override
-	void execute(RoadMap map) {
+	void execute(RoadMap map) throws RoadException, RoadMapException, JunctionException {
 		Road r = createRoad(map);
 		map.addRoad(r);
 	}
 
-	protected abstract Road createRoad(RoadMap map);
+	protected abstract Road createRoad(RoadMap map) throws RoadException;
 
 	protected String getId() {
 		return id;

@@ -5,6 +5,13 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import exceptions.JunctionException;
+import exceptions.RoadException;
+import exceptions.RoadMapException;
+import exceptions.SetContClassException;
+import exceptions.VehicleException;
+import exceptions.WeatherException;
+
 public class TrafficSimulator {
 
 	private RoadMap map;
@@ -14,30 +21,36 @@ public class TrafficSimulator {
 	public TrafficSimulator() {
 		time = 0;
 		events = new ArrayList<>();
+		map = new RoadMap();
 	}
 
 	public void addEvent(Event e) {
 		events.add(e);
-		// Recuerda que la lista de eventos tiene que estar ordenada como se describió
+		// TODO Recuerda que la lista de eventos tiene que estar ordenada como se
+		// describió
 		// anteriormente
 	}
 
-	public void advance() {
+	public void advance() throws VehicleException, SetContClassException, WeatherException, JunctionException,
+			RoadException, RoadMapException {
 		time++;
-		for (int i = 0; i < events.size(); i++) {
+		int i = 0;
+		while (events.size() != 0 && i < events.size()) {
 			if (events.get(i).getTime() == time) {
-				events.get(i).execute(map); // TODO es así o al revés
+				events.get(i).execute(map);
 				events.remove(i);
+			} else {
+				i++;
 			}
 		}
 		List<Junction> junctions = map.getJunctions();
-		for (int i = 0; i < junctions.size(); i++) {
-			junctions.get(i).advance(i);
+		for (int j = 0; j < junctions.size(); j++) {
+			junctions.get(j).advance(j);
 		}
 
 		List<Road> roads = map.getRoads();
-		for (int i = 0; i < roads.size(); i++) {
-			roads.get(i).advance(i);
+		for (int j = 0; j < roads.size(); j++) {
+			roads.get(j).advance(j);
 		}
 
 	}

@@ -3,8 +3,10 @@ package simulator.factories;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import exceptions.SetContClassException;
 import simulator.misc.Pair;
 import simulator.model.Event;
 import simulator.model.NewSetContClassEvent;
@@ -16,7 +18,7 @@ public class SetContClassEventBuilder extends Builder<Event> {
 	}
 
 	@Override
-	protected Event createTheInstance(JSONObject data) {
+	protected Event createTheInstance(JSONObject data) throws JSONException, SetContClassException {
 		List<Pair<String, Integer>> l = new ArrayList<>();
 		for (Object o : data.getJSONArray("info")) {
 			String vehicle = (String) ((JSONObject) o).get("vehicle");

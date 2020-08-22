@@ -1,9 +1,14 @@
 package simulator.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.lang.Math;
 
 import org.json.JSONObject;
+
+import exceptions.RoadException;
+import exceptions.VehicleException;
 
 public class Vehicle extends SimulatedObject {
 
@@ -16,24 +21,35 @@ public class Vehicle extends SimulatedObject {
 	private int contClass; // grado de contaminación (0 - 10)
 	private int contamination; // contaminación total
 	private int distance; // distancia total recorrida
+	private int currentJunction;
 
-	//TODO Asegúrate de que la velocidad del vehículo es 0 cuando su estado no es Traveling
-	
-	protected Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) {
+	protected Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) throws VehicleException{
 		super(id);
-		// TODO complete
+		if (maxSpeed < 0 || contClass < 0 || contClass > 10 || itinerary.size() < 2) {
+			throw new VehicleException("Invalid arguments");
+		}
+		this._id = id;
+		this.maxSpeed = maxSpeed;
+		this.contClass = contClass;
+		this.itinerary = Collections.unmodifiableList(new ArrayList<>(itinerary));
+		currentJunction = 0;
+		status = VehicleStatus.PENDING;
 	}
 
-	protected void setSpeed(int s) {
-		if (s < 0) {
-			// throw exception
-		} else
-			speed = Math.min(s, speed);
+	protected void setSpeed(int s) throws VehicleException{
+		if (!status.equals(VehicleStatus.TRAVELING)) {
+			speed = 0;
+		} else {
+			if (s < 0) {
+				throw new VehicleException("speed negative");
+			} else
+				speed = Math.min(s, speed);
+		}
 	}
 
-	protected void setContaminationClass(int c) {
+	protected void setContaminationClass(int c) throws VehicleException {
 		if (c < 0 || c > 10) {
-			// throw exception
+			throw new VehicleException("Invalid contamination");
 		} else
 			contClass = c;
 	}
@@ -44,32 +60,33 @@ public class Vehicle extends SimulatedObject {
 			contamination += ((location + speed) - location) * contClass;
 			location = Math.min(location + speed, road.getLength());
 			if (location >= road.getLength()) {
-				// el vehículo entra en la cola del cruce correspondiente (llamando
-				// a un método de la clase Junction).
-				// Actualizar estado del vehículo
+				currentJunction++;
+				itinerary.get(currentJunction).enter(this);
+				this.status = VehicleStatus.WAITING;
+				speed = 0;
 			}
 		}
 	}
 
-	protected void moveToNextRoad() {
+	protected void moveToNextRoad() throws VehicleException, RoadException {
 		if (status.equals(VehicleStatus.PENDING) || status.equals(VehicleStatus.WAITING)) {
-			/*
-			 * mueve el vehículo a la siguiente carretera. Este proceso se hace saliendo de
-			 * la carretera actual y entrando a la siguiente carretera de su itinerario, en
-			 * la localización 0. Para salir y entrar de las carreteras, debes utilizar el
-			 * método correspondiente de la clase Road. Para encontrar la siguiente
-			 * carretera, el vehículo debe preguntar al cruce en el cual está esperando (o
-			 * al primero del itinerario en caso de que el estado del vehículo sea Pending)
-			 * mediante una invocación al método correspondiente de la clase Junction.
-			 * Observa que la primera vez que el vehículo llama a este método, el vehículo
-			 * no sale de ninguna carretera ya que el vehículo todavía no ha empezado a
-			 * circular y, que cuando el vehículo abandona el último cruce de su itinerario,
-			 * entonces no puede entrar ya a ninguna carretera dado que ha finalizado su
-			 * recorrido – no olvides modificar el estado del vehículo
-			 */
+			if (currentJunction == itinerary.size() - 1) {
+				road.exit(this);
+				status = VehicleStatus.ARRIVED;
+			} else if (status.equals(VehicleStatus.PENDING)) {
+				road = itinerary.get(currentJunction).roadTo(itinerary.get(++currentJunction));
+				road.enter(this);
+				location = 0;
+				status = VehicleStatus.TRAVELING;
+			} else {
+				road.exit(this);
+				road = itinerary.get(currentJunction).roadTo(itinerary.get(++currentJunction));
+				location = 0;
+				status = VehicleStatus.TRAVELING;
+			}
 		}
 		else {
-			//throw exception
+			throw new VehicleException("VehicleStatus incorrect");
 		}
 	}
 
@@ -84,7 +101,7 @@ public class Vehicle extends SimulatedObject {
 	public int getSpeed() {
 		return speed;
 	}
-	
+
 	public VehicleStatus getStatus() {
 		return status;
 	}

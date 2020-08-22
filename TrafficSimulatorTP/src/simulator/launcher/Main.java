@@ -1,5 +1,7 @@
 package simulator.launcher;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,16 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.json.JSONException;
 
+import exceptions.ControllerException;
+import exceptions.JunctionException;
+import exceptions.RoadException;
+import exceptions.RoadMapException;
+import exceptions.SetContClassException;
+import exceptions.VehicleException;
+import exceptions.WeatherException;
+import simulator.control.Controller;
 import simulator.factories.Builder;
 import simulator.factories.BuilderBasedFactory;
 import simulator.factories.Factory;
@@ -28,10 +39,11 @@ import simulator.factories.SetWeatherEventBuilder;
 import simulator.model.DequeuingStrategy;
 import simulator.model.Event;
 import simulator.model.LightSwitchingStrategy;
+import simulator.model.TrafficSimulator;
 
 public class Main {
 
-	private final static Integer _timeLimitDefaultValue = 10;
+	private static Integer _timeLimitDefaultValue = 10;
 	private static String _inFile = null;
 	private static String _outFile = null;
 	private static Factory<Event> _eventsFactory = null;
@@ -50,7 +62,8 @@ public class Main {
 			parseHelpOption(line, cmdLineOptions);
 			parseInFileOption(line);
 			parseOutFileOption(line);
-
+			parseTicksOption(line);
+			
 			// if there are some remaining arguments, then something wrong is
 			// provided in the command line!
 			//
@@ -99,18 +112,23 @@ public class Main {
 		_outFile = line.getOptionValue("o");
 	}
 
+	private static void parseTicksOption(CommandLine line) throws ParseException {
+		String aux = line.getOptionValue("t");
+		if(aux != null) _timeLimitDefaultValue = Integer.parseInt(aux);
+	}
+
 	private static void initFactories() {
 
 		List<Builder<LightSwitchingStrategy>> lsbs = new ArrayList<>();
 		lsbs.add(new RoundRobinStrategyBuilder());
 		lsbs.add(new MostCrowdedStrategyBuilder());
 		Factory<LightSwitchingStrategy> lssFactory = new BuilderBasedFactory<>(lsbs);
-		
+
 		List<Builder<DequeuingStrategy>> dqbs = new ArrayList<>();
 		dqbs.add(new MoveFirstStrategyBuilder());
 		dqbs.add(new MoveAllStrategyBuilder());
 		Factory<DequeuingStrategy> dqsFactory = new BuilderBasedFactory<>(dqbs);
-		
+
 		List<Builder<Event>> ebs = new ArrayList<>();
 		ebs.add(new NewJunctionEventBuilder(lssFactory, dqsFactory));
 		ebs.add(new NewCityRoadEventBuilder());
@@ -121,11 +139,15 @@ public class Main {
 		_eventsFactory = new BuilderBasedFactory<>(ebs);
 	}
 
-	private static void startBatchMode() throws IOException {
-		// TODO complete this method to start the simulation
+	private static void startBatchMode() throws IOException, VehicleException, JSONException, SetContClassException, WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
+		TrafficSimulator sim = new TrafficSimulator();
+		Controller controller = new Controller(sim, _eventsFactory);
+		controller.loadEvents(new FileInputStream(_inFile));
+		if(_outFile != null)controller.run(_timeLimitDefaultValue, new FileOutputStream(_outFile));
+		else controller.run(_timeLimitDefaultValue, System.out);
 	}
 
-	private static void start(String[] args) throws IOException {
+	private static void start(String[] args) throws IOException, VehicleException, JSONException, SetContClassException, WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
 		initFactories();
 		parseArgs(args);
 		startBatchMode();
