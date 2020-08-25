@@ -38,7 +38,7 @@ public class InterCityRoad extends Road {
 			x = 0;
 			break;
 		}
-		reduceContamination((int) ((100.0 - x) / 100.0) * getContamination());
+		reduceContamination((int) (((100.0 - x) / 100.0) * getContamination()));
 	}
 
 	@Override
@@ -52,12 +52,11 @@ public class InterCityRoad extends Road {
 	}
 
 	@Override
-	protected int calculateVehicleSpeed(Vehicle v) throws VehicleException{
-		if (getWeather().equals(Weather.STORM))
-			v.setSpeed((int) (getSpeedLimit() * 0.8));	
+	protected int calculateVehicleSpeed(Vehicle v) throws VehicleException {
+		if (getWeather() == Weather.STORM)
+			return (int) (getSpeedLimit() * 0.8);
 		else
-			v.setSpeed(getSpeedLimit());
-		return v.getSpeed();
+			return getSpeedLimit();
 	}
 
 }

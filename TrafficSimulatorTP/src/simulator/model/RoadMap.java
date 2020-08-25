@@ -1,6 +1,7 @@
 package simulator.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,6 @@ public class RoadMap {
 				|| !mapJunction.containsKey(r.getDestJunc().getId())) {
 			throw new RoadMapException("Invalid road");
 		}
-		// Cruce origen - carretera
 		mapJunction.get(r.getSrcJunc().getId()).addOutGoingRoad(r);
 		mapJunction.get(r.getDestJunc().getId()).addIncommingRoad(r);
 		listRoad.add(r);
@@ -60,7 +60,7 @@ public class RoadMap {
 				Junction src = v.getItinerary().get(i);
 				Junction dest = v.getItinerary().get(i + 1);
 				for (Road r : listRoad) {
-					valid = valid || (r.getSrcJunc() == src && r.getDestJunc() == dest); // TODO no es &&?
+					valid = valid || (r.getSrcJunc() == src && r.getDestJunc() == dest);
 				}
 				i++;
 			}
@@ -68,7 +68,8 @@ public class RoadMap {
 		if (valid) {
 			listVehicle.add(v);
 			mapVehicle.put(v.getId(), v);
-		} else {
+		}
+		if (!valid) {
 			throw new RoadMapException("Invalid vehicle");
 		}
 	}
@@ -86,15 +87,15 @@ public class RoadMap {
 	}
 
 	public List<Junction> getJunctions() {
-		return listJunction;
+		return Collections.unmodifiableList(new ArrayList<>(listJunction));
 	}
 
 	public List<Road> getRoads() {
-		return listRoad;
+		return Collections.unmodifiableList(new ArrayList<>(listRoad));
 	}
 
 	public List<Vehicle> getVehicles() {
-		return listVehicle;
+		return Collections.unmodifiableList(new ArrayList<>(listVehicle));
 	}
 
 	protected void reset() {
@@ -108,24 +109,24 @@ public class RoadMap {
 
 	public JSONObject report() {
 		JSONObject jo = new JSONObject();
-		JSONArray ja = new JSONArray();
+		JSONArray array = new JSONArray();
 
 		for (Junction j : listJunction) {
-			ja.put(j.report());
+			array.put(j.report());
 		}
-		jo.put("junctions", ja);
+		jo.put("junctions", array);
 
-		ja = new JSONArray();
+		array = new JSONArray();
 		for (Road r : listRoad) {
-			ja.put(r.report());
+			array.put(r.report());
 		}
-		jo.put("road", ja);
+		jo.put("roads", array);
 
-		ja = new JSONArray();
+		array = new JSONArray();
 		for (Vehicle v : listVehicle) {
-			ja.put(v.report());
+			array.put(v.report());
 		}
-		jo.put("vehicles", ja);
+		jo.put("vehicles", array);
 
 		return jo;
 	}

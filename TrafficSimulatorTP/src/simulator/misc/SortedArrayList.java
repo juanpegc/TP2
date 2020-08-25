@@ -35,7 +35,7 @@ public class SortedArrayList<E> extends ArrayList<E> {
 
 		// Start from the end, and look for the first
 		// element that is smaller than or equal to e
-		while (j >= 0 && _cmp.compare(get(j), e) == 1) {
+		while (j >= 0 && _cmp.compare(get(j), e) > 0) {	
 			j--;
 		}
 

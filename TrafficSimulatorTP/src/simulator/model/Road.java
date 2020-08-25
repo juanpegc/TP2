@@ -1,6 +1,5 @@
 package simulator.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -8,6 +7,7 @@ import org.json.JSONObject;
 
 import exceptions.RoadException;
 import exceptions.VehicleException;
+import simulator.misc.SortedArrayList;
 
 public abstract class Road extends SimulatedObject {
 
@@ -32,9 +32,10 @@ public abstract class Road extends SimulatedObject {
 		this.length = length;
 		this.maxSpeed = maxSpeed;
 		speedLimit = maxSpeed;
+		contamination = 0;
 		this.contLimit = contLimit;
 		this.weather = weather;
-		vehicles = new ArrayList<>();
+		vehicles = new SortedArrayList<>();
 	}
 
 	protected void enter(Vehicle v) throws RoadException {
@@ -64,6 +65,12 @@ public abstract class Road extends SimulatedObject {
 		}
 	}
 
+	public void reduceContamination(int c) {
+		contamination = c;
+		if (contamination < 0)
+			contamination = 0;
+	}
+
 	protected abstract void reduceTotalContamination();
 
 	protected abstract void updateSpeedLimit();
@@ -71,13 +78,12 @@ public abstract class Road extends SimulatedObject {
 	protected abstract int calculateVehicleSpeed(Vehicle v) throws VehicleException;
 
 	@Override
-	void advance(int time) throws VehicleException {
+	void advance(int time) throws VehicleException, RoadException {
 		reduceTotalContamination();
 		updateSpeedLimit();
-		for (int i = 0; i < vehicles.size(); i++) {
-			vehicles.get(i).setSpeed(calculateVehicleSpeed(vehicles.get(i)));
-			vehicles.get(i).advance(time);
-			// TODO Ordenar por localización
+		for (Vehicle v : vehicles) {
+			v.setSpeed(calculateVehicleSpeed(v));
+			v.advance(time);
 		}
 
 	}
@@ -118,12 +124,6 @@ public abstract class Road extends SimulatedObject {
 		return contamination;
 	}
 
-	public void reduceContamination(int c) {
-		contamination -= c;
-		if (contamination < 0)
-			contamination = 0;
-	}
-
 	public List<Vehicle> getVehicles() {
 		return vehicles;
 	}
@@ -133,14 +133,14 @@ public abstract class Road extends SimulatedObject {
 		JSONObject jo = new JSONObject();
 		jo.put("id", _id);
 		jo.put("speedlimit", speedLimit);
-		jo.put("weather", weather);
+		jo.put("weather", weather.toString());
 		jo.put("co2", contamination);
-		
-		JSONArray ja = new JSONArray();
-		for(Vehicle v: vehicles) {
-			ja.put(v.report());
+
+		JSONArray jsonArray = new JSONArray();
+		for (Vehicle v : vehicles) {
+			jsonArray.put(v.getId());
 		}
-		jo.put("vehicles", ja);
+		jo.put("vehicles", jsonArray);
 		return jo;
 	}
 

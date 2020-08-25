@@ -13,7 +13,7 @@ public class NewSetContClassEvent extends Event {
 	public NewSetContClassEvent(int time, List<Pair<String, Integer>> cs) throws SetContClassException {
 		super(time);
 		if (cs == null) {
-			throw new SetContClassException("Invalid arguments");
+			throw new SetContClassException("Invalid contamination");
 		}
 		this.cs = cs;
 	}
@@ -24,7 +24,7 @@ public class NewSetContClassEvent extends Event {
 		for (int i = 0; i < cs.size(); i++) {
 			c = cs.get(i);
 			if (map.getVehicle(c.getFirst()) == null) {
-				throw new SetContClassException("Vehicle doesnt exist");
+				throw new SetContClassException("Invalid contamination");
 			}
 			map.getVehicle(c.getFirst()).setContaminationClass((int)c.getSecond());
 		}

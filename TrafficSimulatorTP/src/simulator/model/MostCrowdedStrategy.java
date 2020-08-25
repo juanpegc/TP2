@@ -13,28 +13,34 @@ public class MostCrowdedStrategy implements LightSwitchingStrategy {
 	@Override
 	public int chooseNextGreen(List<Road> roads, List<List<Vehicle>> qs, int currGreen, int lastSwitchingTime,
 			int currTime) {
-		int max = 0;
-		int j = -1;
-		if (roads.isEmpty())
-			return -1;
-		else if (currGreen == -1) {
-			for (int i = 0; i < qs.size(); i++) {
-				if (qs.get(i).size() > max) {
-					max = qs.get(i).size();
-					j = i;
+		int nextGreen = -1, lengthAux;
+
+		if (roads != null && roads.size() > 1) {
+			if (currGreen == -1) {
+				nextGreen = 0;
+				lengthAux = roads.get(0).getLength();
+				for (int i = 1; i < roads.size(); i++)
+					if (roads.get(i).getLength() > lengthAux) {
+						nextGreen = i;
+						lengthAux = roads.get(i).getLength();
+					}
+			} else if (currTime - lastSwitchingTime < timeSlot) {
+				nextGreen = currGreen;
+			} else {
+				nextGreen = (currGreen + 1) % roads.size();
+				lengthAux = roads.get(nextGreen).getLength();
+				int posAux = nextGreen, i = 0;
+				while (i < roads.size()) {
+					if (roads.get(i).getLength() > lengthAux) {
+						nextGreen = i;
+						lengthAux = roads.get(i).getLength();
+					}
+					posAux = (posAux + 1) % roads.size();
+					i++;
 				}
 			}
-			return j;
-		} else if (currTime - lastSwitchingTime < timeSlot)
-			return currGreen;
-		else {
-			for (int i = (currGreen + 1) % roads.size(); i < roads.size(); i++) { //TODO mal
-				if (qs.get(i).size() > max) {
-					max = qs.get(i).size();
-					j = i;
-				}
-			}
-			return j;
 		}
+
+		return nextGreen;
 	}
 }

@@ -13,20 +13,13 @@ public class CityRoad extends Road {
 	@Override
 	protected void reduceTotalContamination() {
 		int x;
-		switch (getWeather()) {
-		case WINDY: {
-			x = 15;
-			break;
-		}
-		case STORM: {
+		Weather w = getWeather();
+		if (w == Weather.WINDY || w == Weather.STORM) {
 			x = 10;
-			break;
-		}
-		default:
+		} else {
 			x = 2;
-			break;
 		}
-		reduceContamination(x);
+		reduceContamination(getContamination() -x);
 	}
 
 	@Override
@@ -36,7 +29,7 @@ public class CityRoad extends Road {
 
 	@Override
 	protected int calculateVehicleSpeed(Vehicle v) {
-		return (int)(((11.0-v.getContClass())/11.0)*getSpeedLimit());
+		return (int) (((11.0 - v.getContClass()) / 11.0) * getSpeedLimit());
 	}
 
 }

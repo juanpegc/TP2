@@ -63,7 +63,7 @@ public class Main {
 			parseInFileOption(line);
 			parseOutFileOption(line);
 			parseTicksOption(line);
-			
+
 			// if there are some remaining arguments, then something wrong is
 			// provided in the command line!
 			//
@@ -89,6 +89,8 @@ public class Main {
 		cmdLineOptions.addOption(
 				Option.builder("o").longOpt("output").hasArg().desc("Output file, where reports are written.").build());
 		cmdLineOptions.addOption(Option.builder("h").longOpt("help").desc("Print this message").build());
+		cmdLineOptions.addOption(Option.builder("t").longOpt("ticks").hasArg()
+				.desc("Ticks to the simulator’s main loop (default value is 10).").build());
 
 		return cmdLineOptions;
 	}
@@ -114,7 +116,8 @@ public class Main {
 
 	private static void parseTicksOption(CommandLine line) throws ParseException {
 		String aux = line.getOptionValue("t");
-		if(aux != null) _timeLimitDefaultValue = Integer.parseInt(aux);
+		if (aux != null)
+			_timeLimitDefaultValue = Integer.parseInt(aux);
 	}
 
 	private static void initFactories() {
@@ -139,18 +142,23 @@ public class Main {
 		_eventsFactory = new BuilderBasedFactory<>(ebs);
 	}
 
-	private static void startBatchMode() throws IOException, VehicleException, JSONException, SetContClassException, WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
+	private static void startBatchMode() throws IOException, VehicleException, JSONException, SetContClassException,
+			WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
 		TrafficSimulator sim = new TrafficSimulator();
 		Controller controller = new Controller(sim, _eventsFactory);
 		controller.loadEvents(new FileInputStream(_inFile));
-		if(_outFile != null)controller.run(_timeLimitDefaultValue, new FileOutputStream(_outFile));
-		else controller.run(_timeLimitDefaultValue, System.out);
+		if (_outFile != null)
+			controller.run(_timeLimitDefaultValue, new FileOutputStream(_outFile));
+		else
+			controller.run(_timeLimitDefaultValue, System.out);
 	}
 
-	private static void start(String[] args) throws IOException, VehicleException, JSONException, SetContClassException, WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
+	private static void start(String[] args) throws IOException, VehicleException, JSONException, SetContClassException,
+			WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
 		initFactories();
 		parseArgs(args);
 		startBatchMode();
+		// TestExamples.main(args);
 	}
 
 	// example command lines:

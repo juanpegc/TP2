@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import exceptions.RoadException;
 import exceptions.VehicleException;
 
-public class Vehicle extends SimulatedObject {
+public class Vehicle extends SimulatedObject implements Comparable<Vehicle>{
 
 	private List<Junction> itinerary; // Lista de cruces
 	private int maxSpeed; // velocidad máxima
@@ -21,29 +21,33 @@ public class Vehicle extends SimulatedObject {
 	private int contClass; // grado de contaminación (0 - 10)
 	private int contamination; // contaminación total
 	private int distance; // distancia total recorrida
-	private int currentJunction;
+	private int lastItinerary;
 
-	protected Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) throws VehicleException{
+	protected Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) throws VehicleException {
 		super(id);
 		if (maxSpeed < 0 || contClass < 0 || contClass > 10 || itinerary.size() < 2) {
 			throw new VehicleException("Invalid arguments");
 		}
-		this._id = id;
 		this.maxSpeed = maxSpeed;
 		this.contClass = contClass;
 		this.itinerary = Collections.unmodifiableList(new ArrayList<>(itinerary));
-		currentJunction = 0;
+		lastItinerary = 1;
+		location = 0;
+		contamination = 0;
+		distance = 0;
+		speed = 0;
 		status = VehicleStatus.PENDING;
+		road = null;
 	}
 
-	protected void setSpeed(int s) throws VehicleException{
+	protected void setSpeed(int s) throws VehicleException {
 		if (!status.equals(VehicleStatus.TRAVELING)) {
 			speed = 0;
 		} else {
 			if (s < 0) {
-				throw new VehicleException("speed negative");
+				throw new VehicleException("Speed negative");
 			} else
-				speed = Math.min(s, speed);
+				speed = Math.min(s, maxSpeed);
 		}
 	}
 
@@ -55,37 +59,49 @@ public class Vehicle extends SimulatedObject {
 	}
 
 	@Override
-	void advance(int time) {
-		if (status.equals(VehicleStatus.TRAVELING)) {
-			contamination += ((location + speed) - location) * contClass;
-			location = Math.min(location + speed, road.getLength());
-			if (location >= road.getLength()) {
-				currentJunction++;
-				itinerary.get(currentJunction).enter(this);
-				this.status = VehicleStatus.WAITING;
+	void advance(int time) throws RoadException {
+		
+		if (status == VehicleStatus.TRAVELING) {
+			int aux = location;
+			if(location + speed >= road.getLength()) {
+				distance += (road.getLength() - location);
+				location = road.getLength();
+			}
+			else {
+				distance += speed;
+				location += speed;
+			}
+			
+			int c = (location - aux) * contClass;
+			road.addContamination(c);
+			contamination += c;
+			
+			if (location == road.getLength()) {
+				itinerary.get(lastItinerary).enter(this);
+				status = VehicleStatus.WAITING;
 				speed = 0;
 			}
 		}
 	}
 
 	protected void moveToNextRoad() throws VehicleException, RoadException {
-		if (status.equals(VehicleStatus.PENDING) || status.equals(VehicleStatus.WAITING)) {
-			if (currentJunction == itinerary.size() - 1) {
+		if (status == VehicleStatus.PENDING || status == VehicleStatus.WAITING) {
+			if (lastItinerary == itinerary.size() - 1 && status != VehicleStatus.PENDING) {
 				road.exit(this);
 				status = VehicleStatus.ARRIVED;
-			} else if (status.equals(VehicleStatus.PENDING)) {
-				road = itinerary.get(currentJunction).roadTo(itinerary.get(++currentJunction));
+			} else if (status == VehicleStatus.PENDING) {
+				road = itinerary.get(lastItinerary - 1).roadTo(itinerary.get(lastItinerary));
 				road.enter(this);
 				location = 0;
 				status = VehicleStatus.TRAVELING;
 			} else {
 				road.exit(this);
-				road = itinerary.get(currentJunction).roadTo(itinerary.get(++currentJunction));
+				road = itinerary.get(lastItinerary).roadTo(itinerary.get(++lastItinerary));
 				location = 0;
+				road.enter(this);
 				status = VehicleStatus.TRAVELING;
 			}
-		}
-		else {
+		} else {
 			throw new VehicleException("VehicleStatus incorrect");
 		}
 	}
@@ -134,10 +150,18 @@ public class Vehicle extends SimulatedObject {
 		jo.put("distance", distance);
 		jo.put("co2", contamination);
 		jo.put("class", contClass);
-		jo.put("status", status);
-		jo.put("road", road);
-		jo.put("location", location);
+		jo.put("status", status.toString());
+		if(status != VehicleStatus.ARRIVED && status != VehicleStatus.PENDING) {
+			jo.put("road", road);
+			jo.put("location", location);
+		}
 		return jo;
 	}
 
+	@Override
+	public int compareTo(Vehicle o) {
+		if(getLocation() > o.getLocation()) return -1;
+		else if(getLocation() < o.getLocation()) return 1;
+		else return 0;
+	}
 }

@@ -20,9 +20,9 @@ public class NewInterCityRoadEvent extends NewRoadEvent {
 
 	@Override
 	protected Road createRoad(RoadMap map) throws RoadException {
-		return new InterCityRoad(super.getId(), map.getJunction(super.getSrcJunc()),
-				map.getJunction(super.getDestJunc()), super.getMaxSpeed(), super.getCo2Limit(), super.getLength(),
-				super.getWeather());
+		return new InterCityRoad(getId(), map.getJunction(getSrcJunc()),
+				map.getJunction(getDestJunc()), getMaxSpeed(), getCo2Limit(), getLength(),
+				getWeather());
 	}
 	
 

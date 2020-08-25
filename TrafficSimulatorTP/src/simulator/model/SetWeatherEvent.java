@@ -13,7 +13,7 @@ public class SetWeatherEvent extends Event{
 	public SetWeatherEvent(int time, List<Pair<String, Weather>> ws) throws WeatherException {
 		super(time);
 		if(ws == null) {
-			throw new WeatherException("Invalid arguments");
+			throw new WeatherException("Invalid weather");
 		}
 		this.ws = ws;
 	}
@@ -24,7 +24,7 @@ public class SetWeatherEvent extends Event{
 		for(int i = 0; i < ws.size(); i++) {
 			w = ws.get(i);
 			if(map.getRoad(w.getFirst()) == null) {
-				throw new WeatherException("Road doesnt exist");
+				throw new WeatherException("Invalid weather");
 			}
 			map.getRoad(w.getFirst()).setWeather(w.getSecond());
 		}

@@ -4,7 +4,6 @@ import exceptions.JunctionException;
 
 public class NewJunctionEvent extends Event {
 
-	Junction j;
 	String id;
 	LightSwitchingStrategy lsStrategy;
 	DequeuingStrategy dqStrategy;
@@ -23,6 +22,7 @@ public class NewJunctionEvent extends Event {
 
 	@Override
 	void execute(RoadMap map) throws JunctionException {
+		Junction j;
 		j = new Junction(id, lsStrategy, dqStrategy, xCoor, yCoor);
 		map.addJunction(j);
 	}
