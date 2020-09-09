@@ -43,7 +43,23 @@ public class Junction extends SimulatedObject {
 		roadList = new HashMap<>();
 		eListRoads = new ArrayList<>();
 	}
+	
+	public List<Road> getInRoads(){
+		return roads;
+	}
+	
+	public int getLightGreenIndex() {
+		return lightGreenIndex;
+	}
 
+	public int getX() {
+		return xCoor;
+	}
+	
+	public int getY() {
+		return yCoor;
+	}
+	
 	protected void addIncommingRoad(Road r) throws JunctionException {
 		if (r.getDestJunc() == this) {
 			roads.add(r);

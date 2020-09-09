@@ -12,7 +12,7 @@ import exceptions.VehicleException;
 import exceptions.WeatherException;
 import simulator.misc.SortedArrayList;
 
-public class TrafficSimulator {
+public class TrafficSimulator implements Observable<TrafficSimObserver>{
 
 	private RoadMap map;
 	private List<Event> events;
@@ -26,11 +26,14 @@ public class TrafficSimulator {
 
 	public void addEvent(Event e) {
 		events.add(e);
+		//onEventAdded(map, events, e, time);
 	}
 
 	public void advance() throws VehicleException, SetContClassException, WeatherException, JunctionException,
 			RoadException, RoadMapException {
-		time++;
+		try{
+			time++;
+		//onAdvanceStart(map, events, time);
 		int i = 0;
 		while (events.size() != 0 && i < events.size()) {
 			if (events.get(i).getTime() == time) {
@@ -49,12 +52,16 @@ public class TrafficSimulator {
 		for (int j = 0; j < roads.size(); j++) {
 			roads.get(j).advance(time);
 		}
-
+		//onAdvanceEnd(map, events, time);
+		}catch(Exception e) {
+			//onError(e.getMessage());
+		}
 	}
 
 	public void reset() {
 		map.reset();
 		events.clear();
+		//onReset(map, events, time);
 	}
 
 	public JSONObject report() {
@@ -65,4 +72,16 @@ public class TrafficSimulator {
 
 	}
 
+	@Override
+	public void addObserver(TrafficSimObserver o) {
+		// TODO Auto-generated method stub
+		//onRegister(map, events, time);
+	}
+
+	@Override
+	public void removeObserver(TrafficSimObserver o) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

@@ -18,6 +18,7 @@ import exceptions.VehicleException;
 import exceptions.WeatherException;
 import simulator.factories.Factory;
 import simulator.model.Event;
+import simulator.model.TrafficSimObserver;
 import simulator.model.TrafficSimulator;
 
 public class Controller {
@@ -59,9 +60,28 @@ public class Controller {
 		PrintStream output = new PrintStream(out);
 		output.println(jo);
 	}
+	
+	public void run(int n) throws VehicleException, SetContClassException, WeatherException, JunctionException, RoadException, RoadMapException {
+		while(n != 0) {
+			sim.advance();
+			n--;
+		}
+	}
 
 	public void reset() {
 		sim.reset();
+	}
+	
+	public void addObserver(TrafficSimObserver o){
+		sim.addObserver(o);
+	}
+	
+	public void removeObserver(TrafficSimObserver o) {
+		sim.removeObserver(o);
+	}
+	
+	void addEvent(Event e) {
+		sim.addEvent(e);
 	}
 
 }

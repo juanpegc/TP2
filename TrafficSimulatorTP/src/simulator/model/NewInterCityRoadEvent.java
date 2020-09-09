@@ -25,5 +25,8 @@ public class NewInterCityRoadEvent extends NewRoadEvent {
 				getWeather());
 	}
 	
-
+	@Override
+	public String toString() {
+		return "New Inter City Road '" + getId() + "'";
+	}
 }

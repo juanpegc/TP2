@@ -18,7 +18,7 @@ public abstract class Event implements Comparable<Event> {
 			_time = time;
 	}
 
-	int getTime() {
+	public int getTime() {
 		return _time;
 	}
 
@@ -29,5 +29,7 @@ public abstract class Event implements Comparable<Event> {
 		else return 0;
 	}
 
+	public abstract String toString();
+	
 	abstract void execute(RoadMap map) throws SetContClassException, WeatherException, VehicleException, JunctionException, RoadException, RoadMapException;
 }
