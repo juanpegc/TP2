@@ -24,7 +24,7 @@ public class NewSetContClassEvent extends Event {
 		for (int i = 0; i < cs.size(); i++) {
 			c = cs.get(i);
 			if (map.getVehicle(c.getFirst()) == null) {
-				throw new SetContClassException("Invalid contamination");
+				throw new SetContClassException("Invalid vehicle of contamination");
 			}
 			map.getVehicle(c.getFirst()).setContaminationClass((int)c.getSecond());
 		}

@@ -94,7 +94,7 @@ public class RoadsTableModel extends AbstractTableModel implements TrafficSimObs
 
 	@Override
 	public void onReset(RoadMap map, List<Event> events, int time) {
-
+		_roads = null;
 	}
 
 	@Override
@@ -105,8 +105,6 @@ public class RoadsTableModel extends AbstractTableModel implements TrafficSimObs
 
 	@Override
 	public void onError(String err) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

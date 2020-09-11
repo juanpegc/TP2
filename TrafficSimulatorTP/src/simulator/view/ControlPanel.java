@@ -33,6 +33,7 @@ public class ControlPanel extends JPanel implements TrafficSimObserver {
 
 	private Controller _ctrl;
 	private Boolean _stopped;
+	private Boolean charged;
 
 	private JButton loadEventsFileButton;
 	private JButton changeCO2ClassButton;
@@ -87,8 +88,11 @@ public class ControlPanel extends JPanel implements TrafficSimObserver {
 		runButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				enableToolBar(false);
-				run();
+				if (charged != null && charged) {
+					enableToolBar(false);
+					run();
+				} else
+					JOptionPane.showMessageDialog(null, "No file loaded", "Invalid Option", JOptionPane.WARNING_MESSAGE);
 			}
 		});
 		runButton.setToolTipText("Run the simulator");
@@ -101,7 +105,7 @@ public class ControlPanel extends JPanel implements TrafficSimObserver {
 			}
 		});
 		stopButton.setToolTipText("Stop the simulator");
-		
+
 		JLabel ticks = new JLabel("Ticks:");
 
 		SpinnerModel value = new SpinnerNumberModel(10, 0, 10000, 1);
@@ -144,6 +148,7 @@ public class ControlPanel extends JPanel implements TrafficSimObserver {
 	}
 
 	private void loadEventsFile() throws Exception {
+		charged = false;
 		try {
 			JFileChooser jfc = new JFileChooser("resources/examples");
 
@@ -153,6 +158,7 @@ public class ControlPanel extends JPanel implements TrafficSimObserver {
 				File selectedFile = jfc.getSelectedFile();
 				_ctrl.reset();
 				_ctrl.loadEvents(new FileInputStream(selectedFile.getAbsolutePath()));
+				charged = true;
 			}
 		} catch (Exception e) {
 			throw new Exception("Failed to load: " + e.getMessage());

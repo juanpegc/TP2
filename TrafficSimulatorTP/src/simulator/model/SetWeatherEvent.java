@@ -24,7 +24,7 @@ public class SetWeatherEvent extends Event{
 		for(int i = 0; i < ws.size(); i++) {
 			w = ws.get(i);
 			if(map.getRoad(w.getFirst()) == null) {
-				throw new WeatherException("Invalid weather");
+				throw new WeatherException("Invalid road of weather");
 			}
 			map.getRoad(w.getFirst()).setWeather(w.getSecond());
 		}

@@ -35,8 +35,7 @@ public class TrafficSimulator implements Observable<TrafficSimObserver> {
 		}
 	}
 
-	public void advance() throws VehicleException, SetContClassException, WeatherException, JunctionException,
-			RoadException, RoadMapException {
+	public void advance() throws Exception {
 		try {
 			time++;
 			for (TrafficSimObserver o : observers) {
@@ -66,7 +65,10 @@ public class TrafficSimulator implements Observable<TrafficSimObserver> {
 				o.onAdvanceEnd(map, events, time);
 			}
 		} catch (Exception e) {
-			// onError(e.getMessage());	//TODO
+			for(TrafficSimObserver o:observers) {
+				o.onError(e.getMessage());
+			}
+			throw new Exception(e.getMessage());
 		}
 	}
 

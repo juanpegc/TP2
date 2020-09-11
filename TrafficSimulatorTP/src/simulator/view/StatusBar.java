@@ -88,8 +88,7 @@ public class StatusBar extends JPanel implements TrafficSimObserver {
 
 	@Override
 	public void onError(String err) {
-		// TODO Auto-generated method stub
-
+		labelEvent.setText("Error: Press Stop button to continue");
 	}
 
 }

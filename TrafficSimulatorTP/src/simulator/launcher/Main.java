@@ -160,8 +160,7 @@ public class Main {
 		_eventsFactory = new BuilderBasedFactory<>(ebs);
 	}
 
-	private static void startBatchMode() throws IOException, VehicleException, JSONException, SetContClassException,
-			WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
+	private static void startBatchMode() throws Exception {
 		TrafficSimulator sim = new TrafficSimulator();
 		Controller controller = new Controller(sim, _eventsFactory);
 		controller.loadEvents(new FileInputStream(_inFile));
@@ -183,8 +182,7 @@ public class Main {
 		});
 	}
 
-	private static void start(String[] args) throws IOException, VehicleException, JSONException, SetContClassException,
-			WeatherException, JunctionException, ControllerException, RoadException, RoadMapException {
+	private static void start(String[] args) throws Exception {
 		initFactories();
 		parseArgs(args);
 		if (!mode)

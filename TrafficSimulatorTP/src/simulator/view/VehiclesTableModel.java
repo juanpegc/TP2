@@ -107,25 +107,23 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 
 	@Override
 	public void onEventAdded(RoadMap map, List<Event> events, Event e, int time) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onReset(RoadMap map, List<Event> events, int time) {
 		
 	}
 
 	@Override
+	public void onReset(RoadMap map, List<Event> events, int time) {
+		_vehicles = null;
+	}
+
+	@Override
 	public void onRegister(RoadMap map, List<Event> events, int time) {
-		this._vehicles = map.getVehicles();
+		_vehicles = map.getVehicles();
 		fireTableDataChanged();
 	}
 
 	@Override
 	public void onError(String err) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 }

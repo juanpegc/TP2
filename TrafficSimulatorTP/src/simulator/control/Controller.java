@@ -51,8 +51,7 @@ public class Controller {
 		}
 	}
 
-	public void run(int n, OutputStream out) throws VehicleException, SetContClassException, WeatherException,
-			JunctionException, RoadException, RoadMapException {
+	public void run(int n, OutputStream out) throws Exception {
 		JSONArray ja = new JSONArray();
 		while (n != 0) {
 			sim.advance();
@@ -65,8 +64,7 @@ public class Controller {
 		output.println(jo);
 	}
 
-	public void run(int n) throws VehicleException, SetContClassException, WeatherException, JunctionException,
-			RoadException, RoadMapException {
+	public void run(int n) throws Exception {
 		while (n != 0) {
 			sim.advance();
 			n--;
