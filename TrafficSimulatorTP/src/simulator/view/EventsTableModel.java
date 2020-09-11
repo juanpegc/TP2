@@ -12,25 +12,21 @@ import simulator.model.TrafficSimObserver;
 
 public class EventsTableModel extends AbstractTableModel implements TrafficSimObserver {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	
-	private Controller _controller;
+
 	private List<Event> _events;
 	private String[] _colNames = { "Time", "Desc." };
 
-	public EventsTableModel(Controller controller) {
-		this._controller = controller;
+	public EventsTableModel(Controller ctrl) {
 		_events = new ArrayList<Event>();
+		ctrl.addObserver(this);
 	}
 
 	public void setEvents(List<Event> events) {
 		this._events = events;
 		update();
 	}
-	
+
 	public void update() {
 		fireTableDataChanged();
 	}
@@ -44,7 +40,7 @@ public class EventsTableModel extends AbstractTableModel implements TrafficSimOb
 	public int getColumnCount() {
 		return _colNames.length;
 	}
-	
+
 	@Override
 	public String getColumnName(int columnIndex) {
 		return _colNames[columnIndex];
@@ -66,32 +62,29 @@ public class EventsTableModel extends AbstractTableModel implements TrafficSimOb
 
 	@Override
 	public void onAdvanceStart(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		setEvents(events);
 	}
 
 	@Override
 	public void onAdvanceEnd(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void onEventAdded(RoadMap map, List<Event> events, Event e, int time) {
-		// TODO Auto-generated method stub
-
+		this._events = events;
+        fireTableDataChanged();
 	}
 
 	@Override
 	public void onReset(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onRegister(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		this._events = events;
+		fireTableDataChanged();
 	}
 
 	@Override

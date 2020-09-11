@@ -17,13 +17,12 @@ public class RoadsTableModel extends AbstractTableModel implements TrafficSimObs
 
 	private static final long serialVersionUID = 1L;
 
-	private Controller _ctrl;
 	private List<Road> _roads;
 	private String[] _colNames = { "Id", "Length", "Weather", "Max. Speed", "SpeedLimit", "Total CO2", "CO2 Limit" };
 
 	public RoadsTableModel(Controller ctrl) {
-		this._ctrl = ctrl;
 		_roads = new ArrayList<Road>();
+		ctrl.addObserver(this);
 	}
 
 	public void setRoads(List<Road> roads) {
@@ -81,32 +80,27 @@ public class RoadsTableModel extends AbstractTableModel implements TrafficSimObs
 
 	@Override
 	public void onAdvanceStart(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		setRoads(map.getRoads());
 	}
 
 	@Override
 	public void onAdvanceEnd(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		setRoads(map.getRoads());
 	}
 
 	@Override
 	public void onEventAdded(RoadMap map, List<Event> events, Event e, int time) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void onReset(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onRegister(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		this._roads = map.getRoads();
+		fireTableDataChanged();
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import simulator.model.Event;
 import simulator.model.RoadMap;
 import simulator.model.TrafficSimObserver;
 import simulator.model.Vehicle;
+import simulator.model.VehicleStatus;
 
 public class VehiclesTableModel extends AbstractTableModel implements TrafficSimObserver {
 
@@ -22,8 +23,8 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 			"Distance" };
 	
 	public VehiclesTableModel(Controller ctrl) {
-		this._ctrl = ctrl;
 		_vehicles = new ArrayList<Vehicle>();
+		ctrl.addObserver(this);
 	}
 	
 	public void setVehicles(List<Vehicle> vehicles) {
@@ -58,10 +59,22 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 			s = _vehicles.get(rowIndex).getId();
 			break;
 		case 1:
-			s = _vehicles.get(rowIndex).getLocation();	//TODO pie de página pag. 8
+			VehicleStatus status = _vehicles.get(rowIndex).getStatus();
+			if(status == VehicleStatus.PENDING) {
+				s = "Pending";
+			}
+			else if(status == VehicleStatus.TRAVELING) {
+				s = (_vehicles.get(rowIndex).getRoad().getId() + ":" + _vehicles.get(rowIndex).getLocation());
+			}
+			else if(status == VehicleStatus.WAITING) {
+				s = ("Waiting:" + _vehicles.get(rowIndex).getCurrentJunction());
+			}
+			else {
+				s = "Arrived";
+			}
 			break;
 		case 2:
-			s = _vehicles.get(rowIndex).getItinerary().toString();	//TODO esto está mal fijo
+			s = _vehicles.get(rowIndex).getItinerary().toString();
 			break;
 		case 3:
 			s = _vehicles.get(rowIndex).getContClass();
@@ -84,14 +97,12 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 
 	@Override
 	public void onAdvanceStart(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		setVehicles(map.getVehicles());
 	}
 
 	@Override
 	public void onAdvanceEnd(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		setVehicles(map.getVehicles());
 	}
 
 	@Override
@@ -102,14 +113,13 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 
 	@Override
 	public void onReset(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void onRegister(RoadMap map, List<Event> events, int time) {
-		// TODO Auto-generated method stub
-
+		this._vehicles = map.getVehicles();
+		fireTableDataChanged();
 	}
 
 	@Override

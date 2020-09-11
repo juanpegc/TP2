@@ -3,6 +3,7 @@ package simulator.control;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,8 +19,10 @@ import exceptions.VehicleException;
 import exceptions.WeatherException;
 import simulator.factories.Factory;
 import simulator.model.Event;
+import simulator.model.Road;
 import simulator.model.TrafficSimObserver;
 import simulator.model.TrafficSimulator;
+import simulator.model.Vehicle;
 
 public class Controller {
 
@@ -34,7 +37,7 @@ public class Controller {
 		this.eventsFactory = eventsFactory;
 	}
 
-	public void loadEvents(InputStream in) throws JSONException, SetContClassException, WeatherException{
+	public void loadEvents(InputStream in) throws JSONException, SetContClassException, WeatherException {
 		JSONObject jo = new JSONObject(new JSONTokener(in));
 		JSONArray ja = new JSONArray();
 		try {
@@ -48,9 +51,10 @@ public class Controller {
 		}
 	}
 
-	public void run(int n, OutputStream out) throws VehicleException, SetContClassException, WeatherException, JunctionException, RoadException, RoadMapException{
+	public void run(int n, OutputStream out) throws VehicleException, SetContClassException, WeatherException,
+			JunctionException, RoadException, RoadMapException {
 		JSONArray ja = new JSONArray();
-		while(n != 0) {
+		while (n != 0) {
 			sim.advance();
 			ja.put(sim.report());
 			n--;
@@ -60,9 +64,10 @@ public class Controller {
 		PrintStream output = new PrintStream(out);
 		output.println(jo);
 	}
-	
-	public void run(int n) throws VehicleException, SetContClassException, WeatherException, JunctionException, RoadException, RoadMapException {
-		while(n != 0) {
+
+	public void run(int n) throws VehicleException, SetContClassException, WeatherException, JunctionException,
+			RoadException, RoadMapException {
+		while (n != 0) {
 			sim.advance();
 			n--;
 		}
@@ -71,17 +76,29 @@ public class Controller {
 	public void reset() {
 		sim.reset();
 	}
-	
-	public void addObserver(TrafficSimObserver o){
+
+	public void addObserver(TrafficSimObserver o) {
 		sim.addObserver(o);
 	}
-	
+
 	public void removeObserver(TrafficSimObserver o) {
 		sim.removeObserver(o);
 	}
-	
-	void addEvent(Event e) {
+
+	public void addEvent(Event e) {
 		sim.addEvent(e);
+	}
+
+	public List<Vehicle> getVehicles() {
+		return sim.getVehicles();
+	}
+
+	public List<Road> getRoads() {
+		return sim.getRoads();
+	}
+	
+	public int getTime() {
+		return sim.getTime();
 	}
 
 }

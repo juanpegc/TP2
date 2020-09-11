@@ -144,4 +144,18 @@ public abstract class Road extends SimulatedObject {
 		return jo;
 	}
 
+	public String toString() {
+		String aux = "";
+		aux += getId() + ":[";
+		for (int i = 0; i < vehicles.size(); i++) {
+			if (vehicles.get(i).getStatus() == VehicleStatus.WAITING) {
+				aux += vehicles.get(i).getId();
+				if (i != vehicles.size() - 1)
+					aux += ", ";
+			}
+		}
+		aux += "]";
+		return aux;
+	}
+
 }

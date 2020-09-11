@@ -1,5 +1,6 @@
 package simulator.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -12,56 +13,71 @@ import exceptions.VehicleException;
 import exceptions.WeatherException;
 import simulator.misc.SortedArrayList;
 
-public class TrafficSimulator implements Observable<TrafficSimObserver>{
+public class TrafficSimulator implements Observable<TrafficSimObserver> {
 
 	private RoadMap map;
 	private List<Event> events;
 	private int time;
 
+	private List<TrafficSimObserver> observers;
+
 	public TrafficSimulator() {
 		time = 0;
 		events = new SortedArrayList<>();
 		map = new RoadMap();
+		observers = new ArrayList<>();
 	}
 
 	public void addEvent(Event e) {
 		events.add(e);
-		//onEventAdded(map, events, e, time);
+		for (TrafficSimObserver o : observers) {
+			o.onEventAdded(map, events, e, time);
+		}
 	}
 
 	public void advance() throws VehicleException, SetContClassException, WeatherException, JunctionException,
 			RoadException, RoadMapException {
-		try{
+		try {
 			time++;
-		//onAdvanceStart(map, events, time);
-		int i = 0;
-		while (events.size() != 0 && i < events.size()) {
-			if (events.get(i).getTime() == time) {
-				events.get(i).execute(map);
-				events.remove(i);
-			} else {
-				i++;
+			for (TrafficSimObserver o : observers) {
+				o.onAdvanceStart(map, events, time);
 			}
-		}
-		List<Junction> junctions = map.getJunctions();
-		for (int j = 0; j < junctions.size(); j++) {
-			junctions.get(j).advance(time);
-		}
 
-		List<Road> roads = map.getRoads();
-		for (int j = 0; j < roads.size(); j++) {
-			roads.get(j).advance(time);
-		}
-		//onAdvanceEnd(map, events, time);
-		}catch(Exception e) {
-			//onError(e.getMessage());
+			int i = 0;
+			while (events.size() != 0 && i < events.size()) {
+				if (events.get(i).getTime() == time) {
+					events.get(i).execute(map);
+					events.remove(i);
+				} else {
+					i++;
+				}
+			}
+			List<Junction> junctions = map.getJunctions();
+			for (int j = 0; j < junctions.size(); j++) {
+				junctions.get(j).advance(time);
+			}
+
+			List<Road> roads = map.getRoads();
+			for (int j = 0; j < roads.size(); j++) {
+				roads.get(j).advance(time);
+			}
+
+			for (TrafficSimObserver o : observers) {
+				o.onAdvanceEnd(map, events, time);
+			}
+		} catch (Exception e) {
+			// onError(e.getMessage());	//TODO
 		}
 	}
 
 	public void reset() {
 		map.reset();
 		events.clear();
-		//onReset(map, events, time);
+		time = 0;
+
+		for (TrafficSimObserver o : observers) {
+			o.onReset(map, events, time);
+		}
 	}
 
 	public JSONObject report() {
@@ -74,14 +90,25 @@ public class TrafficSimulator implements Observable<TrafficSimObserver>{
 
 	@Override
 	public void addObserver(TrafficSimObserver o) {
-		// TODO Auto-generated method stub
-		//onRegister(map, events, time);
+		observers.add(o);
+		o.onRegister(map, events, time);
 	}
 
 	@Override
 	public void removeObserver(TrafficSimObserver o) {
-		// TODO Auto-generated method stub
-		
+		observers.remove(o);
+	}
+
+	public List<Vehicle> getVehicles() {
+		return map.getVehicles();
+	}
+	
+	public List<Road> getRoads(){
+		return map.getRoads();
+	}
+
+	public int getTime() {
+		return time;
 	}
 	
 }

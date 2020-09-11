@@ -141,6 +141,10 @@ public class Vehicle extends SimulatedObject implements Comparable<Vehicle>{
 	public int getDistance() {
 		return distance;
 	}
+	
+	public String getCurrentJunction() {
+		return itinerary.get(lastItinerary).getId();
+	}
 
 	@Override
 	public JSONObject report() {
