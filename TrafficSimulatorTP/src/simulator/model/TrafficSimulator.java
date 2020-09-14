@@ -5,12 +5,6 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import exceptions.JunctionException;
-import exceptions.RoadException;
-import exceptions.RoadMapException;
-import exceptions.SetContClassException;
-import exceptions.VehicleException;
-import exceptions.WeatherException;
 import simulator.misc.SortedArrayList;
 
 public class TrafficSimulator implements Observable<TrafficSimObserver> {

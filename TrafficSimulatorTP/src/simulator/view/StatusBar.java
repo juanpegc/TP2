@@ -22,7 +22,6 @@ public class StatusBar extends JPanel implements TrafficSimObserver {
 
 	private JLabel labelTime;
 	private JLabel labelEvent;
-	private int time;
 
 	public StatusBar(Controller ctrl) {
 
@@ -54,7 +53,6 @@ public class StatusBar extends JPanel implements TrafficSimObserver {
 	public void setTime(int time) {
 		if (labelTime != null) {
 			labelTime.setText("Time: " + time);
-			this.time = time;
 		}
 	}
 

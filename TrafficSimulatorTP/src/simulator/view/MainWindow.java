@@ -19,6 +19,8 @@ import simulator.control.Controller;
 
 public class MainWindow extends JFrame {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Controller _ctrl;
 
 	public MainWindow(Controller ctrl) {
@@ -29,7 +31,7 @@ public class MainWindow extends JFrame {
 
 	public void initGUI() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
-		this.setContentPane(mainPanel);
+		setContentPane(mainPanel);
 		mainPanel.add(new ControlPanel(_ctrl), BorderLayout.PAGE_START);
 		mainPanel.add(new StatusBar(_ctrl), BorderLayout.PAGE_END);
 
@@ -70,11 +72,11 @@ public class MainWindow extends JFrame {
 		mapByRoadView.setPreferredSize(new Dimension(500, 400));
 		mapsPanel.add(mapByRoadView);
 
-		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		this.pack();
-		this.setVisible(true);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		pack();
+		setVisible(true);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setSize((int) (screenSize.width / 1.5), screenSize.height);
+		setSize((int) (screenSize.width / 1.5), screenSize.height);
 		setLocationRelativeTo(null);
 	}
 

@@ -11,11 +11,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import exceptions.ControllerException;
-import exceptions.JunctionException;
-import exceptions.RoadException;
-import exceptions.RoadMapException;
 import exceptions.SetContClassException;
-import exceptions.VehicleException;
 import exceptions.WeatherException;
 import simulator.factories.Factory;
 import simulator.model.Event;
@@ -23,6 +19,7 @@ import simulator.model.Road;
 import simulator.model.TrafficSimObserver;
 import simulator.model.TrafficSimulator;
 import simulator.model.Vehicle;
+import simulator.view.ControlPanel;
 
 public class Controller {
 

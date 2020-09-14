@@ -7,7 +7,7 @@ import exceptions.SetContClassException;
 import exceptions.VehicleException;
 import exceptions.WeatherException;
 
-public abstract class Event implements Comparable<Event> {
+public abstract class Event implements Comparable<Event>{
 
 	protected int _time;
 

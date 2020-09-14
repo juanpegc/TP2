@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import simulator.control.Controller;
 import simulator.model.Event;
@@ -17,16 +16,15 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 
 	private static final long serialVersionUID = 1L;
 
-	private Controller _ctrl;
 	private List<Vehicle> _vehicles;
 	private String[] _colNames = { "Id", "Location", "Itinerary", "CO2 Class", "Max. Speed", "Speed", "Total CO2",
 			"Distance" };
-	
+
 	public VehiclesTableModel(Controller ctrl) {
 		_vehicles = new ArrayList<Vehicle>();
 		ctrl.addObserver(this);
 	}
-	
+
 	public void setVehicles(List<Vehicle> vehicles) {
 		this._vehicles = vehicles;
 		update();
@@ -45,52 +43,51 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 	public int getColumnCount() {
 		return _colNames.length;
 	}
-	
+
 	@Override
 	public String getColumnName(int columnIndex) {
 		return _colNames[columnIndex];
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		Object s = null;
+	public String getValueAt(int rowIndex, int columnIndex) {
+		String s = "";
 		switch (columnIndex) {
 		case 0:
-			s = _vehicles.get(rowIndex).getId();
+			s += _vehicles.get(rowIndex).getId();
 			break;
 		case 1:
 			VehicleStatus status = _vehicles.get(rowIndex).getStatus();
-			if(status == VehicleStatus.PENDING) {
-				s = "Pending";
-			}
-			else if(status == VehicleStatus.TRAVELING) {
-				s = (_vehicles.get(rowIndex).getRoad().getId() + ":" + _vehicles.get(rowIndex).getLocation());
-			}
-			else if(status == VehicleStatus.WAITING) {
-				s = ("Waiting:" + _vehicles.get(rowIndex).getCurrentJunction());
-			}
-			else {
-				s = "Arrived";
+			if (status == VehicleStatus.PENDING) {
+				s += "Pending";
+			} else if (status == VehicleStatus.TRAVELING) {
+				s += (_vehicles.get(rowIndex).getRoad().getId() + ":" + _vehicles.get(rowIndex).getLocation());
+			} else if (status == VehicleStatus.WAITING) {
+				s += ("Waiting:" + _vehicles.get(rowIndex).getCurrentJunction());
+			} else {
+				s += "Arrived";
 			}
 			break;
 		case 2:
-			s = _vehicles.get(rowIndex).getItinerary().toString();
+			s += _vehicles.get(rowIndex).getItinerary().toString();
 			break;
 		case 3:
-			s = _vehicles.get(rowIndex).getContClass();
+			s += _vehicles.get(rowIndex).getContClass();
 			break;
 		case 4:
-			s = _vehicles.get(rowIndex).getMaxSpeed();
+			s += _vehicles.get(rowIndex).getMaxSpeed();
 			break;
 		case 5:
-			s = _vehicles.get(rowIndex).getSpeed();
+			s += _vehicles.get(rowIndex).getSpeed();
 			break;
 		case 6:
-			s = _vehicles.get(rowIndex).getContamination();
+			s += _vehicles.get(rowIndex).getContamination();
 			break;
-		case 7: 
-			s = _vehicles.get(rowIndex).getDistance();
+		case 7:
+			s += _vehicles.get(rowIndex).getDistance();
 			break;
+		default:
+			s = null;
 		}
 		return s;
 	}
@@ -107,7 +104,7 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 
 	@Override
 	public void onEventAdded(RoadMap map, List<Event> events, Event e, int time) {
-		
+
 	}
 
 	@Override
@@ -123,7 +120,7 @@ public class VehiclesTableModel extends AbstractTableModel implements TrafficSim
 
 	@Override
 	public void onError(String err) {
-		
+
 	}
 
 }

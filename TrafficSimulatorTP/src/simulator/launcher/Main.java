@@ -3,7 +3,6 @@ package simulator.launcher;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +18,7 @@ import org.apache.commons.cli.ParseException;
 import org.json.JSONException;
 
 import exceptions.ControllerException;
-import exceptions.JunctionException;
-import exceptions.RoadException;
-import exceptions.RoadMapException;
 import exceptions.SetContClassException;
-import exceptions.VehicleException;
 import exceptions.WeatherException;
 import simulator.control.Controller;
 import simulator.factories.Builder;
@@ -43,6 +38,7 @@ import simulator.model.DequeuingStrategy;
 import simulator.model.Event;
 import simulator.model.LightSwitchingStrategy;
 import simulator.model.TrafficSimulator;
+import simulator.view.ControlPanel;
 import simulator.view.MainWindow;
 
 public class Main {
@@ -173,7 +169,10 @@ public class Main {
 	private static void startGUIMode() throws ControllerException, JSONException, FileNotFoundException, SetContClassException, WeatherException {
 		TrafficSimulator sim = new TrafficSimulator();
 		Controller controller = new Controller(sim, _eventsFactory);
-		if(_inFile != null) controller.loadEvents(new FileInputStream(_inFile));
+		if(_inFile != null) {
+			controller.loadEvents(new FileInputStream(_inFile));
+			ControlPanel.charged = true;
+		}
 		SwingUtilities.invokeLater(new Runnable(){
 			@Override
 			public void run() {

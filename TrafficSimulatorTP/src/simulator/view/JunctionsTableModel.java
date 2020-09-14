@@ -49,18 +49,18 @@ public class JunctionsTableModel extends AbstractTableModel implements TrafficSi
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		Object s = null;
+	public String getValueAt(int rowIndex, int columnIndex) {
+		String s = "";
 		switch (columnIndex) {
 		case 0:
-			s = _junctions.get(rowIndex).getId();
+			s += _junctions.get(rowIndex).getId();
 			break;
 		case 1:
-			s = _junctions.get(rowIndex).getLightGreenIndex();
-			if (s.equals(-1))
-				s = "NONE";
+			int light = _junctions.get(rowIndex).getLightGreenIndex();
+			if (light == -1)
+				s += "NONE";
 			else
-				s = _junctions.get(rowIndex).getInRoads().get((int) s).getId();
+				s += _junctions.get(rowIndex).getInRoads().get(light).getId().toString();
 			break;
 		case 2:
 			if ((_junctions.get(rowIndex).getLightGreenIndex()) != -1) {
@@ -70,6 +70,8 @@ public class JunctionsTableModel extends AbstractTableModel implements TrafficSi
 				}
 			}
 			break;
+		default:
+			s = null;
 		}
 		return s;
 	}

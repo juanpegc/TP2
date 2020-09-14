@@ -47,15 +47,17 @@ public class EventsTableModel extends AbstractTableModel implements TrafficSimOb
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		Object s = null;
+	public String getValueAt(int rowIndex, int columnIndex) {
+		String s = "";
 		switch (columnIndex) {
 		case 0:
-			s = _events.get(rowIndex).getTime();
+			s += _events.get(rowIndex).getTime();
 			break;
 		case 1:
-			s = _events.get(rowIndex).toString();
+			s += _events.get(rowIndex).toString();
 			break;
+		default:
+			s = null;
 		}
 		return s;
 	}

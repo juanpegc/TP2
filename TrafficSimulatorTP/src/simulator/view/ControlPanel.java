@@ -2,8 +2,6 @@ package simulator.view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -31,9 +29,11 @@ import simulator.model.TrafficSimObserver;
 
 public class ControlPanel extends JPanel implements TrafficSimObserver {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Controller _ctrl;
 	private Boolean _stopped;
-	private Boolean charged;
+	public static Boolean charged;
 
 	private JButton loadEventsFileButton;
 	private JButton changeCO2ClassButton;
@@ -136,7 +136,7 @@ public class ControlPanel extends JPanel implements TrafficSimObserver {
 		toolBar.add(stopButton);
 		toolBar.add(ticks);
 		toolBar.add(ticksSpinner);
-		toolBar.add(Box.createHorizontalGlue());
+		toolBar.add(Box.createGlue());
 		toolBar.addSeparator();
 		toolBar.add(exitButton);
 

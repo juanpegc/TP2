@@ -15,7 +15,6 @@ import javax.swing.JComponent;
 
 import simulator.control.Controller;
 import simulator.model.Event;
-import simulator.model.Junction;
 import simulator.model.Road;
 import simulator.model.RoadMap;
 import simulator.model.TrafficSimObserver;
